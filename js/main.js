@@ -90,6 +90,8 @@ window.onload = function () {
   let background1;
   let background2;
   let gameOver = false;
+  let powerUps;
+  let lastPowerUpTime = 0;
 
   // Función para precargar los assets
   function preload() {
@@ -104,6 +106,8 @@ window.onload = function () {
     this.load.audio("backgroundMusic", "assets/background-music.mp3");
     this.load.audio("shootSound", "assets/shoot-sound.mp3");
     this.load.audio("levelUpSound", "assets/level-up-sound.mp3");
+    this.load.image("powerUp", "assets/powerup.png");
+    this.load.image("bulletPlus", "assets/bulletPlus.png");
   }
 
   // Función para crear los elementos del juego
@@ -116,6 +120,9 @@ window.onload = function () {
     // Crear el jugador
     player = this.physics.add.sprite(400, 500, "spaceship");
     player.setCollideWorldBounds(true); // La nave no puede salir de los límites del mundo
+
+    powerUps = this.physics.add.group();
+    this.physics.add.overlap(player, powerUps, collectPowerUp, null, this);
 
     // Crear controles de cursor
     cursors = this.input.keyboard.createCursorKeys();
@@ -198,11 +205,21 @@ window.onload = function () {
       }
     }
 
-    // Reciclar balas fuera de la pantalla
-    bullets.children.each(function (bullet) {
-      if (bullet.active && bullet.y < 0) {
-        bullet.setActive(false);
-        bullet.setVisible(false);
+    // Generar nuevas balas
+    if (time > lastPowerUpTime) {
+      let powerUp = powerUps.create(Phaser.Math.Between(0, 800), 0, "powerUp");
+      powerUp.setVelocity(0, Phaser.Math.Between(100, 200));
+      lastPowerUpTime = time + Phaser.Math.Between(5000, 10000); // Generar cada 5 a 10 segundos
+    }
+
+    bullets.children.each((bullet) => {
+      if (bullet.active && (bullet.y < 0 || bullet.y > config.height)) {
+        if (bullet.texture.key === "bulletPlus") {
+          bullet.destroy();
+        } else {
+          bullet.setActive(false);
+          bullet.setVisible(false);
+        }
       }
     }, this);
 
@@ -244,6 +261,47 @@ window.onload = function () {
       createBlinkEffect.call(this, player); // Llamar a la función de parpadeo
     } else {
       endGame.call(this);
+    }
+  }
+
+  function collectPowerUp(player, powerUp) {
+    powerUp.destroy();
+    createEnhancedBullets(); // Llamar a la función para crear balas mejoradas
+
+    // Cambiar el tipo de bala durante 3 segundos
+    bullets.children.each((bullet) => {
+      bullet.setTexture("bulletPlus"); // Cambiar la textura a 'enhancedBullet'
+    });
+
+    // Temporizador para restaurar el tipo de bala después de 3 segundos
+    this.time.delayedCall(3000, () => {
+      bullets.children.each((bullet) => {
+        bullet.setTexture("bullet"); // Restaurar la textura a 'bullet'
+      });
+    });
+
+    // Destruir balas mejoradas que estén arriba de la pantalla
+    bullets.children.each((bullet) => {
+      if (bullet.texture.key === "bulletPlus" && bullet.y < 0) {
+        bullet.destroy();
+      }
+    });
+  }
+
+  function createEnhancedBullets() {
+    let enhancedBullets = bullets.createMultiple({
+      key: "enhancedBullet",
+      quantity: 5,
+      active: false,
+      visible: false,
+    });
+
+    if (enhancedBullets) {
+      enhancedBullets.forEach((bullet) => {
+        bullet.setCollideWorldBounds(true);
+        bullet.setVelocityY(-500); // Velocidad más rápida que las balas normales
+        bullet.setAccelerationY(-500); // Aceleración para que suban más rápido
+      });
     }
   }
 
