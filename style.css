@@ -9,10 +9,41 @@ body {
     font-family: Arial, sans-serif;
 }
 
+#backgroundContainer {
+    width: 800px;
+    height: 600px;
+    background-color: #000;
+    position: relative; /* Necesario para que los elementos hijos con posición absoluta se posicionen en relación a este contenedor */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 #startScreen, #gameOverScreen {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    z-index: 10;
+}
+
+#titleImage {
+    
+   
+    position: absolute; /* Permite mover la imagen libremente */
+    top: -48%; /* Ajusta según sea necesario */
+    left: 50%; /* Centra horizontalmente */
+    transform: translateX(-60%); /* Ajusta para centrar horizontalmente */
+    max-width: 300%;
+    z-index: 1; /* Asegura que la imagen se superponga al contenido */
 }
 
 #startScreen h1, #gameOverScreen h1 {
@@ -36,8 +67,12 @@ body {
     margin-bottom: 20px;
 }
 
-#gameCanvas {
-    border: 1px solid #fff;
+#livesDisplay {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    z-index: 1;
 }
 
 .music-button {
@@ -48,3 +83,56 @@ body {
     height: 40px;
     cursor: pointer;
 }
+
+canvas {
+    display: block;
+    border: 1px solid #fff;
+}
+/*********************************************************/
+
+/* Estilos para centrar el cuadro de "Game Over" y su contenido */
+#gameOverScreen {
+    height: 350px;
+    width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5); /* Cambia el color de fondo según tu preferencia */
+    padding: 20px; /* Agrega padding para espaciar el contenido del borde */
+    border-radius: 10px; /* Agrega bordes redondeados si lo deseas */
+    z-index: 999; /* Asegúrate de que el mensaje de Game Over aparezca sobre el resto del contenido */
+}
+#gameOverScreen h1 {
+    color: white; /* Cambia el color del texto según tu preferencia */
+    font-size: 3em; /* Tamaño de fuente */
+    margin-top: 45%;
+    margin-left: 25%;
+}
+#gameOverScreen img {
+    max-width: 100%; /* Asegúrate de que la imagen no exceda el ancho del contenedor */
+    height: auto; /* Mantén la proporción de la imagen */
+    
+    margin-top: 35%;
+    margin-left: 10%;
+    margin-bottom: 0%;
+}
+#gameOverScreen button {
+    
+    margin: 0px auto 0 35%; /* Espacio entre la imagen y el botón, y centrado horizontalmente */
+    padding: 10px 20px; /* Espaciado interno del botón */
+    background-color: #ff0000; /* Cambia el color de fondo del botón según tu preferencia */
+    color: white; /* Cambia el color del texto del botón según tu preferencia */
+    border: none;
+    cursor: pointer;
+    font-size: 1.5em; /* Tamaño de fuente */
+    
+}
+#gameOverScreen button:hover {
+    background-color: #00ff00; /* Color de fondo del botón al pasar el mouse */
+}
+
