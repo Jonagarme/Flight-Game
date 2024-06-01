@@ -19,6 +19,7 @@ window.onload = function () {
     let game; // Variable para almacenar la instancia del juego
     let isMusicPlaying = true; // Estado de la música
 
+    // Eventos de botones
     startButton.addEventListener("click", startGame);
     restartButton.addEventListener("click", () => {
         window.location.reload(); // Recargar la página
@@ -61,7 +62,7 @@ window.onload = function () {
         physics: {
             default: 'arcade',
             arcade: {
-                gravity: { y: 0 },
+                gravity: { y: 0 }, // Sin gravedad
                 debug: false
             }
         }
@@ -87,6 +88,7 @@ window.onload = function () {
     let bulletTime = 0;
     let background1;
     let background2;
+    let gameOver = false;
 
     // Función para precargar los assets
     function preload() {
@@ -141,6 +143,8 @@ window.onload = function () {
 
     // Función para actualizar el estado del juego
     function update(time, delta) {
+        if (gameOver) return; // Si el juego ha terminado, no continuar con la actualización
+
         // Mover el fondo
         background1.tilePositionY -= 2;
         if (level === 2) {
@@ -186,7 +190,8 @@ window.onload = function () {
 
         // Generar meteoros
         if (time > lastMeteorTime) {
-            let meteor = meteors.create(Phaser.Math.Between(0, 800), 0, 'meteor');
+            let meteorType = Math.random() < 0.5 ? 'meteor' : 'bigMeteor'; // Elegir aleatoriamente el tipo de meteoro
+            let meteor = meteors.create(Phaser.Math.Between(0, 800), 0, meteorType);
             meteor.setVelocity(0, Phaser.Math.Between(100, 200));
             lastMeteorTime = time + 2000;
         }
@@ -202,98 +207,119 @@ window.onload = function () {
         this.physics.add.overlap(bullets, meteors, hitMeteor, null, this);
         this.physics.add.overlap(player, meteors, hitPlayer, null, this);
         this.physics.add.overlap(player, stars, collectStar, null, this);
+    }
 
-        // Función llamada cuando una bala impacta un meteoro
-        function hitMeteor(bullet, meteor) {
-            bullet.setActive(false);
-            bullet.setVisible(false);
-            meteor.destroy();
-            score += 10;
-            scoreText.setText('Puntaje: ' + score);
-        }
+    // Función llamada cuando una bala impacta un meteoro
+    function hitMeteor(bullet, meteor) {
+        bullet.setActive(false);
+        bullet.setVisible(false);
+        meteor.destroy();
+        incrementaScore.call(this, 10); // Incrementar el puntaje por 10
+    }
 
-        // Función llamada cuando el jugador colisiona con un meteoro
-        function hitPlayer(player, meteor) {
-            meteor.destroy();
-            if (lives > 0) {
-                lives -= 1;
-                livesText.setText('Vidas: ' + lives);
-                createBlinkEffect.call(this, player); // Llamar a la función de parpadeo
-            } else {
-                endGame();
-            }
-        }
-
-        // Función para crear un efecto de parpadeo en la nave
-        function createBlinkEffect(sprite) {
-            this.tweens.add({
-                targets: sprite,
-                alpha: 0,
-                ease: 'Linear',
-                duration: 100,
-                repeat: 5,
-                yoyo: true,
-                onComplete: () => {
-                    sprite.alpha = 1;
-                }
-            });
-        }
-
-        // Función para finalizar el juego
-        function endGame() {
-            player.setTint(0xff0000);
-            backgroundMusic.stop();
-            const gameOverScreen = document.getElementById("gameOverScreen");
-            gameOverScreen.style.display = "block";
-
-            restartButton.removeEventListener("click", restartGame);
-            restartButton.addEventListener("click", restartGame);
-
-            game.scene.pause();
-            this.physics.pause();
-        }
-
-        // Función para reiniciar el juego
-        function restartGame() {
-            const gameOverScreen = document.getElementById("gameOverScreen");
-            gameOverScreen.style.display = "none";
-            player.clearTint();
-            score = 0;
-            level = 1;
-            lives = 3;
-            scoreText.setText('Puntaje: ' + score);
-            levelText.setText('Nivel: ' + level);
+    // Función llamada cuando el jugador colisiona con un meteoro
+    function hitPlayer(player, meteor) {
+        meteor.destroy();
+        if (lives > 0) {
+            lives -= 1;
             livesText.setText('Vidas: ' + lives);
-            background1.setVisible(true);
-            background2.setVisible(false);
-            backgroundMusic.stop();
-            backgroundMusic.play();
-            game.scene.resume();
-            this.physics.resume();
+            createBlinkEffect.call(this, player); // Llamar a la función de parpadeo
+        } else {
+            endGame.call(this);
         }
+    }
 
-        // Función llamada cuando el jugador recoge una estrella
-        function collectStar(player, star) {
-            star.destroy();
-            score += 1;
-            scoreText.setText('Puntaje: ' + score);
-            if (score >= 100 && level === 1) {
+    // Función para crear un efecto de parpadeo en la nave
+    function createBlinkEffect(sprite) {
+        this.tweens.add({
+            targets: sprite,
+            alpha: 0,
+            ease: 'Linear',
+            duration: 100,
+            repeat: 5,
+            yoyo: true,
+            onComplete: () => {
+                sprite.alpha = 1;
+            }
+        });
+    }
+
+    // Función para verificar si es necesario subir de nivel
+    function checkLevelUp() {
+        let residuo = score % 100; // Calcula el residuo
+        console.log('Residuo:', residuo); // Mostrar resultado en la consola
+        if (score > 0 && residuo === 0) {
+            levelUp.call(this);
+        }
+    }
+
+    // Función para incrementar el puntaje y verificar el nivel
+    function incrementaScore(puntos) {
+        let startingScore = score; // Guardar el puntaje inicial
+
+        score += puntos; // Incrementar el puntaje
+        scoreText.setText('Puntaje: ' + score); // Actualizar el texto del puntaje
+
+        // Verificar cada múltiplo de 100 cruzado
+        for (let i = Math.floor(startingScore / 100) + 1; i <= Math.floor(score / 100); i++) {
+            if (i * 100 <= score) {
                 levelUp.call(this);
             }
         }
+    }
 
-        // Función para subir de nivel
-        function levelUp() {
-            level = 2;
-            meteors.clear(true, true);
-            stars.clear(true, true);
-            levelText.setText('Nivel: 2');
-            levelUpSound.play();
-            background1.setVisible(false);
-            background2.setVisible(true);
-            backgroundMusic.stop();
-            backgroundMusic = this.sound.add('backgroundMusic', { loop: true });
-            backgroundMusic.play();
-        }
+    // Función para finalizar el juego
+    function endGame() {
+        player.setTint(0xff0000);
+        backgroundMusic.stop();
+        const gameOverScreen = document.getElementById("gameOverScreen");
+        gameOverScreen.style.display = "block";
+
+        restartButton.removeEventListener("click", restartGame);
+        restartButton.addEventListener("click", restartGame);
+
+        game.scene.pause();
+        this.physics.pause();
+        gameOver = true; // Marcar que el juego ha terminado
+    }
+
+    // Función para reiniciar el juego
+    function restartGame() {
+        const gameOverScreen = document.getElementById("gameOverScreen");
+        gameOverScreen.style.display = "none";
+        player.clearTint();
+        score = 0;
+        level = 1;
+        lives = 3;
+        scoreText.setText('Puntaje: ' + score);
+        levelText.setText('Nivel: ' + level);
+        livesText.setText('Vidas: ' + lives);
+        background1.setVisible(true);
+        background2.setVisible(false);
+        backgroundMusic.stop();
+        backgroundMusic.play();
+        game.scene.resume();
+        this.physics.resume();
+        gameOver = false; // Reiniciar el estado del juego
+    }
+
+    // Función llamada cuando el jugador recoge una estrella
+    function collectStar(player, star) {
+        star.destroy();
+        incrementaScore.call(this, 1); // Incrementar el puntaje por 1
+    }
+
+    // Función para subir de nivel
+    function levelUp() {
+        level += 1;
+        meteors.clear(true, true);
+        stars.clear(true, true);
+        levelText.setText('Nivel: ' + level);
+        levelUpSound.play();
+        background1.setVisible(false);
+        background2.setVisible(true);
+        backgroundMusic.stop();
+        backgroundMusic = this.sound.add('backgroundMusic', { loop: true });
+        backgroundMusic.play();
     }
 };
