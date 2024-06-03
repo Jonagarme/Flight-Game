@@ -11,34 +11,43 @@
 </head>
 <body>
     <div id="backgroundContainer">
-        <div id="startScreen">
-            <img id="titleImage" src="assets/titleimg.png" alt="Título de Astro Adventure">
-            <h1>Astro Adventure</h1>
-            <label for="spaceshipSelect">Selecciona tu nave:</label>
-            <select id="spaceshipSelect">
-                <option value="assets/spaceship.png">Nave 1</option>
-                <option value="assets/spaceship2.png">Nave 2</option>
-                <option value="assets/spaceship3.png">Nave 3</option>
-            </select>
-            <img id="spaceshipPreview" src="assets/spaceship.png" alt="Previsualización de la Nave Espacial">
-            <button id="startButton">Iniciar</button>
-            <button id="exitButton">Salir</button>
-        </div>
-        <!-- <div id="livesDisplay">Vidas: <span id="livesCount">3</span></div> -->
-
-        <div id="gameOverScreen" style="display: none;">
-            <img id="titleImage" src="assets/titleimg.png" alt="Título de Astro Adventure">
-            <h1>Game Over</h1>
-            
-            <button id="restartButton">Reintentar</button>
-        </div>
         <div id="gameCanvas"></div>
+        
+        <div id="overlayScreens">
+            <div id="startScreen">
+                <img id="titleImage" src="assets/titleimg.png" alt="Título de Astro Adventure">
+                <h1>Astro Adventure</h1>
+                <label for="spaceshipSelect">Selecciona tu nave:</label>
+                <select id="spaceshipSelect">
+                    <option value="assets/spaceship.png">Nave 1</option>
+                    <option value="assets/spaceship2.png">Nave 2</option>
+                    <option value="assets/spaceship3.png">Nave 3</option>
+                </select>
+                <img id="spaceshipPreview" src="assets/spaceship.png" alt="Previsualización de la Nave Espacial">
+                <button id="startButton">Iniciar</button>
+                <button id="exitButton">Salir</button>
+            </div>
+        
+            <div id="gameOverScreen" style="display: none;">
+                <img id="titleImage" src="assets/titleimg.png" alt="Título de Astro Adventure">
+                <h1>Game Over</h1>
+                <button id="restartButton">Reintentar</button>
+            </div>
+
+        </div>
+
+        <div id="instructionsScreen" style="display: none;">
+            <h1>Instrucciones</h1>
+            <p>Utiliza las teclas de flecha para mover la nave.</p>
+            <p>Presiona la barra espaciadora para disparar.</p>
+            <p>Recoge estrellas para ganar puntos.</p>
+            <p>Evita los meteoros para no perder vidas.</p>
+            <button id="closeInstructionsButton">Cerrar</button>
+        </div>
+
+        <button id="instructionsButton" class="game-button">Instrucciones</button>
     </div>
     <img id="musicButton" src="assets/music-on.png" alt="Música" class="music-button">
-    <div id="gameOverScreen" style="display: none;">
-        <h1>Game Over</h1>
-        <button id="restartButton">Reintentar</button>
-    </div>
     
 </body>
 </html>

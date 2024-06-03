@@ -19,7 +19,7 @@ body {
     align-items: center;
 }
 
-#startScreen, #gameOverScreen {
+#startScreen, #gameOverScreen, #instructionsScreen {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -46,11 +46,11 @@ body {
     z-index: 1; /* Asegura que la imagen se superponga al contenido */
 }
 
-#startScreen h1, #gameOverScreen h1 {
+#startScreen h1, #gameOverScreen h1, #instructionsScreen h1 {
     margin-bottom: 20px;
 }
 
-#startScreen button, #gameOverScreen button {
+#startScreen button, #gameOverScreen button, #instructionsScreen button {
     margin: 5px;
     padding: 10px 20px;
     font-size: 16px;
@@ -136,3 +136,56 @@ canvas {
     background-color: #00ff00; /* Color de fondo del botón al pasar el mouse */
 }
 
+
+
+
+
+#instructionsScreen {
+    height: 350px;
+    width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5); /* Cambia el color de fondo según tu preferencia */
+    padding: 20px; /* Agrega padding para espaciar el contenido del borde */
+    border-radius: 10px; /* Agrega bordes redondeados si lo deseas */
+    z-index: 999; /* Asegúrate de que el mensaje de Instrucciones aparezca sobre el resto del contenido */
+}
+
+#instructionsScreen h1 {
+    color: white; /* Cambia el color del texto según tu preferencia */
+    font-size: 3em; /* Tamaño de fuente */
+    margin-bottom: 20px;
+}
+
+#instructionsScreen p {
+    color: white;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#instructionsScreen button {
+    margin: 0px auto 0 35%; /* Espacio entre la imagen y el botón, y centrado horizontalmente */
+    padding: 10px 20px; /* Espaciado interno del botón */
+    background-color: #ff0000; /* Cambia el color de fondo del botón según tu preferencia */
+    color: white; /* Cambia el color del texto del botón según tu preferencia */
+    border: none;
+    cursor: pointer;
+    font-size: 1.5em; /* Tamaño de fuente */
+}
+
+#instructionsScreen button:hover {
+    background-color: #00ff00; /* Color de fondo del botón al pasar el mouse */
+}
+
+#gameCanvas {
+    position: relative;
+    width: 800px;
+    height: 600px;
+}
